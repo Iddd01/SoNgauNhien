@@ -1,0 +1,39 @@
+Function SoNgauNghien(iMin As Long, iMax As Long)
+    Call Randomize
+    SoNgauNghien = Int((iMax - iMin + 1) * Rnd + iMin)
+End Function
+
+Sub LichTruc()
+Dim i&, j&, Lr&, d&, t&, R&, C&, k&, a&
+Dim Arr(), N(), KQ(), Dic As Object, Key
+Dim Sh As Worksheet
+Set Sh = Sheets("LichTruc")
+Lr = Sh.Cells(100000, 3).End(xlUp).Row
+Arr = Sh.Range("C3:K" & Lr).Value
+R = UBound(Arr): C = UBound(Arr, 2)
+
+ReDim KQ(1 To R * C, 1 To 1)
+Set Dic = CreateObject("Scripting.Dictionary")
+d = 2
+For i = 2 To R
+    If Weekday(Arr(i, 1)) = 2 Then Dic.RemoveAll
+    a = 0
+    ReDim N(1 To C - 1, 1 To 1)
+        For j = 2 To C
+             If Arr(i, j) = "Đi làm" Then a = a + 1: N(a, 1) = Arr(1, j)
+        Next j
+Run:
+            d = SoNgauNghien(1, a)
+            Key = N(d, 1)
+            If Not Dic.Exists(Key) And KQ(i - 1, 1) <> Key Then
+                k = k + 1: Dic.Add (Key), k
+                KQ(i, 1) = Key
+            Else
+                GoTo Run
+            End If
+Next i
+Sh.Range("O3").Resize(R, 1).ClearContents
+Sh.Range("O3").Resize(R, 1) = KQ
+Sh.Range("O3") = Sh.Range("O2")
+MsgBox "OK"
+End Sub
